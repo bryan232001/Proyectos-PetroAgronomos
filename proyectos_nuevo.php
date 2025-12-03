@@ -1,7 +1,16 @@
 <?php
 session_start();
 if (!isset($_SESSION['usuario'])) { header('Location: login.php'); exit; }
+
+require_once __DIR__ . '/includes/helpers.php'; // Para helpers de CSRF
 require_once __DIR__ . '/includes/db.php';
+
+// Verificar token CSRF
+if (!csrf_token_verify($_POST['csrf_token'] ?? '')) {
+    $_SESSION['flash_error'] = 'Error de validación (CSRF). Inténtalo de nuevo.';
+    header('Location: proyectos_carrito.php');
+    exit;
+}
 
 $nombre  = trim($_POST['nombre'] ?? '');
 $tipo_id = (int)($_POST['tipo_id'] ?? 0); // puede venir vacío

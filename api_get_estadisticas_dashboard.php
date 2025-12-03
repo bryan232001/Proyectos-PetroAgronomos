@@ -4,16 +4,38 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/includes/db.php';
 
 try {
-    // 1. Proyectos por estado
+    // 1. Proyectos por estado de entrega
     $estadosProyectos = $pdo->query("
-        SELECT 
-            pe.nombre as estado,
-            pe.color,
-            COUNT(p.id) as cantidad
-        FROM proyecto_estados pe
-        LEFT JOIN proyectos p ON pe.id_estado = p.id_estado
-        GROUP BY pe.id_estado, pe.nombre, pe.color
-        ORDER BY pe.orden
+        SELECT
+            estado,
+            color,
+            COUNT(id_asignacion) as cantidad
+        FROM (
+            SELECT
+                pa.id_asignacion,
+                CASE
+                    WHEN aer.porcentaje_entrega = 100 THEN 'Completado'
+                    WHEN aer.porcentaje_entrega > 0 AND aer.porcentaje_entrega < 100 THEN 'En Progreso'
+                    ELSE 'No Iniciado'
+                END as estado,
+                CASE
+                    WHEN aer.porcentaje_entrega = 100 THEN '#22c55e' -- verde
+                    WHEN aer.porcentaje_entrega > 0 AND aer.porcentaje_entrega < 100 THEN '#f59e0b' -- ambar
+                    ELSE '#ef4444' -- rojo
+                END as color
+            FROM
+                proyecto_asignacion pa
+            LEFT JOIN
+                asignacion_entregas_resumen aer ON pa.id_asignacion = aer.id_asignacion
+        ) as subquery
+        GROUP BY
+            estado, color
+        ORDER BY
+            CASE estado
+                WHEN 'Completado' THEN 1
+                WHEN 'En Progreso' THEN 2
+                ELSE 3
+            END
     ")->fetchAll(PDO::FETCH_ASSOC);
 
     // 2. Inversión por mes (últimos 12 meses)

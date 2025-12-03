@@ -5,8 +5,36 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 require_once __DIR__ . '/helpers.php';
 
+// Generar token CSRF para la sesión.
+csrf_token_generate();
+
+// Lógica de tiempo de espera por inactividad
+if (isset($_SESSION['id_usuario'])) {
+    $timeout = 1800; // 30 minutos en segundos
+
+    if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout) {
+        // La sesión ha expirado
+        session_unset();
+        session_destroy();
+        // Redirigir a login con un mensaje
+        header("Location: login.php?error=session_expired");
+        exit;
+    }
+    // Actualizar la última actividad en cada carga de página
+    $_SESSION['last_activity'] = time();
+}
+
+
+
 // Para mostrar el botón de menú en páginas del dashboard
 $is_dashboard = $is_dashboard ?? false;
+
+// Si es una página del dashboard y no hay sesión, redirigir a login
+if ($is_dashboard && !isset($_SESSION['id_usuario'])) {
+    header('Location: ' . url_to('login.php'));
+    exit;
+}
+
 echo "<!-- is_dashboard: " . ($is_dashboard ? 'true' : 'false') . " -->"; // Debugging line
 ?>
 <!doctype html>
@@ -46,7 +74,7 @@ echo "<!-- is_dashboard: " . ($is_dashboard ? 'true' : 'false') . " -->"; // Deb
         </div>
         <div class="header-right">
           <p class="welcome-message">
-            Bienvenido, <strong><?php echo htmlspecialchars($_SESSION['usuario_nombre'] ?? 'Usuario'); ?></strong>
+            Bienvenido, <strong><?php echo htmlspecialchars($_SESSION['nombre'] ?? 'Usuario'); ?></strong>
           </p>
         </div>
       </div>
@@ -73,9 +101,11 @@ echo "<!-- is_dashboard: " . ($is_dashboard ? 'true' : 'false') . " -->"; // Deb
               <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
             </a>
           <?php else: ?>
-            <a href="login.php" class="btn-header">
-              <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-            </a>
+            <?php if (!isset($is_login_page) || !$is_login_page): ?>
+              <a href="login.php" class="btn-header">
+                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+              </a>
+            <?php endif; ?>
           <?php endif; ?>
         </div>
       </div>

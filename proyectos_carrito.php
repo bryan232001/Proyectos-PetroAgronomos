@@ -165,6 +165,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                 <div class="card-form-body">
                   <h3 class="subsection-title"><i class="fas fa-plus-circle me-2"></i> Crear nuevo</h3>
                   <form action="proyectos_nuevo.php" method="post" autocomplete="off">
+                    <?= csrf_input() ?>
                     <div class="form-group">
                       <label for="nombre_proyecto">Nombre del proyecto</label>
                       <input type="text" id="nombre_proyecto" name="nombre" required class="nice-input">
@@ -211,6 +212,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                     
                     if ($puede_eliminar): ?>
                     <form method="post" action="proyectos_eliminar.php" onsubmit="return confirm('¿Seguro que deseas eliminar este proyecto? Esta acción no se puede deshacer.');">
+                      <?= csrf_input() ?>
                       <input type="hidden" name="proyecto_id" value="<?= (int)$proyecto_id ?>">
                       <button type="submit" class="btn-danger mt-2"><i class="fas fa-trash-alt me-2"></i>
                         Eliminar proyecto seleccionado
@@ -256,6 +258,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
               </div>
             <?php else: ?>
               <form action="proyectos_cart_add.php" method="post" class="form-grid-3-auto" id="formAddProduct">
+                <?= csrf_input() ?>
                 <input type="hidden" name="proyecto_id" value="<?= (int)$proyecto_id ?>">
 
                 <div class="form-group">
@@ -327,6 +330,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                 echo '<div class="form-actions-end mt-3">';
                 echo '<a class="btn-secondary" href="proyectos_cart_clear.php?proyecto_id='.(int)$proyecto_id.'"><i class="fas fa-trash-alt me-2"></i> Vaciar</a>';
                 echo '<form action="proyectos_cart_save.php" method="post">';
+                echo csrf_input();
                 echo '<input type="hidden" name="proyecto_id" value="'.(int)$proyecto_id.'">';
                 echo '<button class="btn-primary" type="submit"><i class="fas fa-save me-2"></i> Guardar Proyecto</button>';
                 echo '</form>';

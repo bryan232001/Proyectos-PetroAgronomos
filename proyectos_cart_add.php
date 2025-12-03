@@ -3,7 +3,16 @@
 session_start();
 header('Content-Type: application/json');
 
+require_once __DIR__ . '/includes/helpers.php'; // Para helpers de CSRF
+
 $response = ['ok' => false, 'message' => 'Error desconocido.'];
+
+// Verificar token CSRF
+if (!csrf_token_verify($_POST['csrf_token'] ?? '')) {
+    $response['message'] = 'Error de validación (CSRF). Recarga la página y vuelve a intentarlo.';
+    echo json_encode($response);
+    exit;
+}
 
 if (!isset($_SESSION['usuario'])) {
     $response['message'] = 'No ha iniciado sesión.';

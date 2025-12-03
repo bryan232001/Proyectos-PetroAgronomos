@@ -35,6 +35,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <i class="fa-solid fa-plus-circle"></i>
             <span>Crear Proyectos</span>
         </a>
+        <!-- <a href="mapa_proyectos.php" class="nav-link <?= ($current_page == 'mapa_proyectos.php') ? 'active' : '' ?>">
+            <i class="fa-solid fa-map"></i>
+            <span>Mapa de Proyectos</span>
+        </a> -->
         
         <!-- Menú desplegable de Asignaciones -->
         <div class="nav-dropdown">

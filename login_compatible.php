@@ -78,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['usuario'] = $u['usuario'];
         $_SESSION['email']   = $u['email'];
         $_SESSION['id_rol']  = (int)$u['id_rol'];
+        $_SESSION['last_activity'] = time(); // <--- AÑADIR ESTA LÍNEA
 
         // Actualizar último acceso
         try {
