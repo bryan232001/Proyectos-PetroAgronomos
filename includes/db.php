@@ -1,9 +1,17 @@
 <?php
-$DB_HOST = '127.0.0.1';   // mejor que 'localhost'
-$DB_PORT = '3306';        // cambia si usas otro puerto (a veces 3307)
-$DB_NAME = 'Proyectos_agronomos';  // verifica el nombre exacto de tu BD
-$DB_USER = 'root';
-$DB_PASS = 'Petroecuador';
+// Cargar el autoloader de Composer
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Cargar las variables de entorno
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
+
+// Ahora, las variables están disponibles en $_ENV
+$DB_HOST = $_ENV['DB_HOST'];
+$DB_PORT = '3306'; // Opcional, podrías añadirlo a .env si cambia
+$DB_NAME = $_ENV['DB_NAME'];
+$DB_USER = $_ENV['DB_USER'];
+$DB_PASS = $_ENV['DB_PASS'];
 
 $dsn = "mysql:host=$DB_HOST;port=$DB_PORT;dbname=$DB_NAME;charset=utf8mb4";
 try {
@@ -12,7 +20,10 @@ try {
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
   ]);
 } catch (PDOException $e) {
-  die('Error de conexión: ' . $e->getMessage());
+  // En producción, es mejor no mostrar el mensaje de error detallado.
+  // Podríamos manejar esto con la configuración de errores que discutimos.
+  error_log('Error de conexión a la BD: ' . $e->getMessage());
+  die('Error de conexión a la base de datos. Por favor, intente más tarde.');
 }
 
 // al final de includes/db.php

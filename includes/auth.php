@@ -3,9 +3,21 @@ session_start();
 require_once 'config.php';
 require_once 'db.php';
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// Configuración de errores
+if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'production') {
+    // En producción: no mostrar errores, guardarlos en un log.
+    ini_set('display_errors', 0);
+    ini_set('display_startup_errors', 0);
+    error_reporting(E_ALL);
+    ini_set('log_errors', 1);
+    // Asegúrate de que el servidor web tenga permisos para escribir en esta ruta.
+    ini_set('error_log', APP_ROOT . '/logs/php_errors.log'); 
+} else {
+    // En desarrollo: mostrar todos los errores.
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+}
 
 function registrarLog($id_usuario, $accion, $descripcion = '') {
     global $pdo;
